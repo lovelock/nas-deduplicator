@@ -1,3 +1,5 @@
+# This repo is for learning, use this https://github.com/sreedevk/deduplicator in your product environment.
+
 ## 背景
 
 群晖相册里面，由于很多次的备份，稳妥起见，所以有很多文件重复备份了很多次，从很多不同设备里面备份的。所以相册看起来比较混乱。
