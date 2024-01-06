@@ -8,21 +8,43 @@
 
 ## 快速开始
 
+### 预编译的二进制文件
+
+```bash
+wget  dedup-${od}-${arch}.tar.xz
+tar xjv dedup-${od}-${arch}.tar.xz
+./dedup <FROM_PATH> <TO_PATH>
+```
+
+### 从源码编译
+
+```bash
+git clone https://github.com/lovelock/nas-deduplicator.git
+cd nas-deduplicator
+cargo build --release
+./target/release/dedup <FROM_PATH> <TO_PATH>
+```
+
+
 ## 测试用例
 
+```
 photos
     - a
     - b （和a相同，覆盖相同文件在同一个目录下的情况）
     - c （没有和别的文件相同）
     - d
         - a （和上级目录里的a/b都相同）
+```
 
 把重复的文件放在 dups
 
+```
 photos/a 和 photos/d/a 这两个文件是完全相同的，为了防止有hash碰撞，dups/a 就只剩一个文件，另外一个就丢了，万一发生了hash碰撞，就真的丢了一个文件。
 
 photos/a => dups/a
 photos/d/a => dups/d/a
+```
 
 ## 设计思路
 

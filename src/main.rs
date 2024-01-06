@@ -59,7 +59,6 @@ fn first_found(path: &Path) -> bool {
     let _: () = conn.incr(hash.clone(), 1)
         .unwrap_or_else(|_| panic!("failed to execute INCR for {}", path.to_str().unwrap().trim()));
 
-
     let count: i32 = conn.get(hash.clone()).unwrap_or_else(|_| panic!("failed to execute GET for {}", path.to_str().unwrap().trim()));
 
     println!("path {}, hash {} ", path.to_str().unwrap().trim(), hash.as_str());
