@@ -2,7 +2,7 @@
 
 ## 背景
 
-群晖相册里面，由于很多次的备份，稳妥起见，所以有很多文件重复备份了很多次，从很多不同设备里面备份的。所以相册看起来比较混乱。
+由于之前各种重复备份，就有很多重复文件，所以群晖相册看起来比较混乱。
 
 ## 目标
 
@@ -13,8 +13,8 @@
 ### 预编译的二进制文件
 
 ```bash
-wget  dedup-${od}-${arch}.tar.xz
-tar xjv dedup-${od}-${arch}.tar.xz
+wget dedup-aarch64-apple-darwin.tar.xz 
+tar xjv dedup-aarch64-apple-darwin.tar.xz 
 ./dedup <FROM_PATH> <TO_PATH>
 ```
 
