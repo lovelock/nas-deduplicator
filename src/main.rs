@@ -27,7 +27,7 @@ fn walk_dir(from_path: &Path, to_path: &Path) {
     for entry in WalkDir::new(from_path) {
         let entry = entry.unwrap();
         let this_path = entry.path();
-        if !this_path.is_dir() && !first_found(this_path) && !this_path.is_symlink() && !this_path.to_str().unwrap().contains("@") {
+        if !this_path.is_dir() && !this_path.is_symlink() && !this_path.to_str().unwrap().contains("@") && !first_found(this_path) {
             let relative = this_path.relative_to(from_path).expect("failed to get the relative path");
 
             let mut b = to_path.join(relative.as_str());
