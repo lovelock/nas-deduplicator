@@ -27,19 +27,23 @@ fn walk_dir(from_path: &Path, to_path: &Path) {
     for entry in WalkDir::new(from_path) {
         let entry = entry.unwrap();
         let this_path = entry.path();
-        if !this_path.is_dir() && !this_path.is_symlink() && !this_path.to_str().unwrap().contains("@") && !first_found(this_path) {
-            let relative = this_path.relative_to(from_path).expect("failed to get the relative path");
+        if this_path.is_dir() || this_path.is_symlink() || this_path.to_str().unwrap().contains("@") {
+            println!("path {} skipped", this_path.to_str().unwrap());
+        } else {
+            if !first_found(this_path) {
+                let relative = this_path.relative_to(from_path).expect("failed to get the relative path");
 
-            let mut b = to_path.join(relative.as_str());
-            b.pop();
-            create_dir_all(b.to_str().unwrap()).expect("failed to create dir");
-            fs::rename(this_path, to_path.join(relative.as_str())).unwrap_or_else(|_| { panic!("{}", format!("move file {} failed", this_path.to_str().unwrap().trim()).as_str().trim().to_string()) });
+                let mut b = to_path.join(relative.as_str());
+                b.pop();
+                create_dir_all(b.to_str().unwrap()).expect("failed to create dir");
+                fs::rename(this_path, to_path.join(relative.as_str())).unwrap_or_else(|_| { panic!("{}", format!("move file {} failed", this_path.to_str().unwrap().trim()).as_str().trim().to_string()) });
 
-            let mut cwd = PathBuf::from(this_path.to_str().unwrap());
-            cwd.pop();
-            println!("{}", cwd.to_str().unwrap().trim());
-            if cwd.read_dir().unwrap().next().is_none() {
-                remove_dir(cwd).unwrap();
+                let mut cwd = PathBuf::from(this_path.to_str().unwrap());
+                cwd.pop();
+                println!("{}", cwd.to_str().unwrap().trim());
+                if cwd.read_dir().unwrap().next().is_none() {
+                    remove_dir(cwd).unwrap();
+                }
             }
         }
     }
