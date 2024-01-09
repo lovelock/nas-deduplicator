@@ -1,12 +1,13 @@
 use fs::File;
-use std::{fs, io};
+use std::fs;
 use std::fs::{create_dir_all, remove_dir};
+use std::hash::Hasher;
 use std::path::{Path, PathBuf};
 
 use clap::Parser;
+use memmap2::Mmap;
 use redis::Commands;
 use relative_path::PathExt;
-use sha2::{Digest, Sha256};
 use walkdir::WalkDir;
 
 #[derive(Debug, Parser)]
@@ -45,11 +46,15 @@ fn walk_dir(from_path: &Path, to_path: &Path) {
 }
 
 fn crypto(path: &Path) -> String {
-    let mut file = File::open(path).unwrap();
-    let mut hasher = Sha256::new();
-    let _ = io::copy(&mut file, &mut hasher).unwrap();
-    let hash = hasher.finalize();
-    format!("{:x}", hash)
+    let file = File::open(path).unwrap();
+    let mapper = unsafe { Mmap::map(&file).unwrap() };
+    let mut primhasher = fxhash::FxHasher::default();
+
+    mapper
+        .chunks(1_000_000)
+        .for_each(|chunk| primhasher.write(chunk));
+
+    primhasher.finish().to_string()
 }
 
 fn first_found(path: &Path) -> bool {

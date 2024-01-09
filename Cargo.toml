@@ -7,8 +7,9 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.4.13", features = ["derive"] }
+fxhash = "0.2.1"
 hashes = { version = "0.1.9", features = ["std"] }
+memmap2 = "0.9.3"
 redis = "0.24.0"
 relative-path = "1.9.2"
-sha2 = "0.10.8"
 walkdir = "2.4.0"

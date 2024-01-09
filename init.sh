@@ -3,7 +3,7 @@
 
 rm -rf /tmp/dedup/dups/*
 
-cd /tmp/dedup/photos
+mkdir -p /tmp/dedup/{photos,dups} && cd /tmp/dedup/photos
 
 echo 'aaaa' > a
 echo 'aaaa' > b
