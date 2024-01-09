@@ -57,3 +57,8 @@ photos/d/a => dups/d/a
 3. The counter would increase by 1 in any case and then check the value of the counter
    - counter > 1 indicates the file was found before which should be moved to dups
    - counter == 1 indicates the file was a first found and nothing further should be done
+
+## FAQ
+
+1. Q: Why do I have to deploy a redis server instead of using a map in the program?
+   A: Imagine there are plenty of directories to scan, you scan A today and B in another day, as long as the redis server is alive, you'll be able to get a global unique file.
