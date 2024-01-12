@@ -36,7 +36,16 @@ fn walk_dir(from_path: &Path, to_path: &Path) {
                 let mut b = to_path.join(relative.as_str());
                 b.pop();
                 create_dir_all(b.to_str().unwrap()).expect("failed to create dir");
-                fs::rename(this_path, to_path.join(relative.as_str())).unwrap_or_else(|_| { panic!("{}", format!("move file {} failed", this_path.to_str().unwrap().trim()).as_str().trim().to_string()) });
+
+                let mut from_path = this_path.clone();
+                let mut dest_path = to_path.join(relative.as_str());
+
+                if this_path.to_str().unwrap().contains(" ") {
+                    from_path = &*PathBuf::from(this_path.to_str().unwrap().replace(" ", r"\ "));
+                    dest_path = PathBuf::from(dest_path.to_str().unwrap().replace(" ", r"\ "));
+                }
+
+                fs::rename(from_path, dest_path).unwrap_or_else(|_| { panic!("{}", format!("move file {} failed", this_path.to_str().unwrap().trim()).as_str().trim().to_string()) });
 
                 let mut cwd = PathBuf::from(this_path.to_str().unwrap());
                 cwd.pop();
