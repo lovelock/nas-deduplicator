@@ -37,11 +37,11 @@ fn walk_dir(from_path: &Path, to_path: &Path) {
                 b.pop();
                 create_dir_all(b.to_str().unwrap()).expect("failed to create dir");
 
-                let mut from_path = this_path.clone();
+                let mut from_path = this_path.to_owned();
                 let mut dest_path = to_path.join(relative.as_str());
 
                 if this_path.to_str().unwrap().contains(" ") {
-                    from_path = &*PathBuf::from(this_path.to_str().unwrap().replace(" ", r"\ "));
+                    from_path = PathBuf::from(this_path.to_str().unwrap().replace(" ", r"\ "));
                     dest_path = PathBuf::from(dest_path.to_str().unwrap().replace(" ", r"\ "));
                 }
 
