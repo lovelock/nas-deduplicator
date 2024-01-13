@@ -9,6 +9,7 @@ use memmap2::Mmap;
 use redis::Commands;
 use relative_path::PathExt;
 use walkdir::WalkDir;
+use log::{info, warn};
 
 #[derive(Debug, Parser)]
 struct Cli {
@@ -17,6 +18,7 @@ struct Cli {
 }
 
 fn main() {
+    env_logger::init();
     let args = Cli::parse();
     let from = PathBuf::from(&args.from_path);
     let to = PathBuf::from(&args.to_path);
@@ -28,7 +30,7 @@ fn walk_dir(from_path: &Path, to_path: &Path) {
         let entry = entry.unwrap();
         let this_path = entry.path();
         if this_path.is_dir() || this_path.is_symlink() || this_path.to_str().unwrap().contains("@") {
-            println!("path {} skipped", this_path.to_str().unwrap());
+            warn!("path {} skipped", this_path.to_str().unwrap());
         } else {
             if !first_found(this_path) {
                 let relative = this_path.relative_to(from_path).expect("failed to get the relative path");
@@ -37,20 +39,23 @@ fn walk_dir(from_path: &Path, to_path: &Path) {
                 b.pop();
                 create_dir_all(b.to_str().unwrap()).expect("failed to create dir");
 
-                let mut from_path = this_path.to_owned();
-                let mut dest_path = to_path.join(relative.as_str());
+                let from_path = this_path.to_owned();
+                let dest_path = to_path.join(relative.as_str());
 
-                if this_path.to_str().unwrap().contains(" ") {
-                    from_path = PathBuf::from(this_path.to_str().unwrap().replace(" ", r"\ "));
-                    dest_path = PathBuf::from(dest_path.to_str().unwrap().replace(" ", r"\ "));
+                info!("from path: {}", from_path.to_str().unwrap());
+                info!("dest path: {}", dest_path.to_str().unwrap());
+                if !dest_path.parent().unwrap().exists() {
+                    info!("creating {}", dest_path.parent().unwrap().to_str().unwrap().trim());
+                    create_dir_all(dest_path.parent().unwrap()).expect("Create dir failed");
                 }
 
-                fs::rename(from_path, dest_path).unwrap_or_else(|_| { panic!("{}", format!("move file {} failed", this_path.to_str().unwrap().trim()).as_str().trim().to_string()) });
+                fs::rename(from_path.clone(), dest_path).unwrap_or_else(|_| { panic!("{}", format!("move file {} failed", from_path.to_str().unwrap().trim()).as_str().trim().to_string()) });
 
                 let mut cwd = PathBuf::from(this_path.to_str().unwrap());
                 cwd.pop();
-                println!("{}", cwd.to_str().unwrap().trim());
+                info!("checking if the cwd is empty {}", cwd.to_str().unwrap().trim());
                 if cwd.read_dir().unwrap().next().is_none() {
+                    warn!("the {} is empty and will remove it", cwd.to_str().unwrap().trim());
                     remove_dir(cwd).unwrap();
                 }
             }
@@ -74,10 +79,8 @@ fn first_found(path: &Path) -> bool {
     let hash = crypto(path);
     let mut conn = connect();
 
-    let _: () = conn.incr(hash.clone(), 1)
+    let count: i32 = conn.incr(hash.clone(), 1)
         .unwrap_or_else(|_| panic!("failed to execute INCR for {}", path.to_str().unwrap().trim()));
-
-    let count: i32 = conn.get(hash.clone()).unwrap_or_else(|_| panic!("failed to execute GET for {}", path.to_str().unwrap().trim()));
 
     println!("path {}, hash {} ", path.to_str().unwrap().trim(), hash.as_str());
 

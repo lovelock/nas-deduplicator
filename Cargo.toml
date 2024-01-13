@@ -7,8 +7,10 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.4.13", features = ["derive"] }
+env_logger = { version = "0.10.1", features = ["auto-color"] }
 fxhash = "0.2.1"
 hashes = { version = "0.1.9", features = ["std"] }
+log = "0.4.20"
 memmap2 = "0.9.3"
 redis = "0.24.0"
 relative-path = "1.9.2"
